@@ -65,6 +65,8 @@ File::open( std::string name_, Mode mode_ )
 
     //FileSystem::getFileSize( _name, _size );
 	_size = 2*1024*1024; //HACK
+	// getFileSize runs stat on the given file name which fails as we just work on a buffer
+	// Proper solution would be to add getSize() to MP4FileProvider
 
     _isOpen = true;
     return false;
