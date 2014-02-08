@@ -1,0 +1,48 @@
+<html>
+<head>
+	<title>extract bitrate from mp4 file</title>
+
+	<script src="extractbitrate.js"></script>
+</head>
+
+<body>
+
+<input type="file" id="files" name="files[]"/>
+<output id="list"></output>
+
+<script type='text/javascript'>
+	function handleFileSelect(evt) {
+		var size = 2*1024*1024;
+		var files = evt.target.files;
+		for (var i = 0, f; f = files[i]; i++) {
+			var blob = f.slice(0, size);
+			var reader = new FileReader();
+
+			reader.onloadend = function(evt){
+				if(evt.target.readyState == FileReader.DONE){
+					var arr = new Uint8Array(evt.target.result);
+					var buf = Module._malloc(arr.length);
+					Module.HEAPU8.set(arr, buf);
+
+					// int extractbitrate(unsigned char *buffer, int size)
+					var bitrate = Module.ccall(
+						'extractbitrate', 'number',
+						['number', 'number'],
+						[buf, arr.length]);
+
+					Module._free(buf);
+
+					document.getElementById('list').innerHTML =
+						'<p>' + bitrate + '</p>';
+				}
+			};
+
+			reader.readAsArrayBuffer(blob);
+		}
+	}
+
+	document.getElementById('files').addEventListener('change', handleFileSelect, false);
+</script>
+
+</body>
+</html>
