@@ -1,0 +1,17 @@
+extractbitrate.bc
+extractbitrate.js*
+*.o
+*.lo
+*.la
+.libs
+.deps
+.dirstamp
+mp4v2/libtool
+mp4v2/GNUmakefile
+mp4v2/config.log
+mp4v2/config.status
+mp4v2/libplatform/config.h
+mp4v2/libplatform/impl.h.gch/
+mp4v2/libplatform/stamp-h1
+mp4v2/libutil/impl.h.gch/
+mp4v2/src/impl.h.gch/

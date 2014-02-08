@@ -63,7 +63,8 @@ File::open( std::string name_, Mode mode_ )
     if( _provider.open( _name, _mode ))
         return true;
 
-    FileSystem::getFileSize( _name, _size );
+    //FileSystem::getFileSize( _name, _size );
+	_size = 2*1024*1024; //HACK
 
     _isOpen = true;
     return false;
