@@ -52,6 +52,10 @@ int p_close(void *handle){
 	return 0; // nothing to do
 }
 
+int64_t p_filesize(void *handle){
+	return gbuf_size;
+}
+
 int extractbitrate(unsigned char *buf, int size){
 	printf("size: %i; head: %c%c%c%c\n",
 		size, buf[4], buf[5], buf[6], buf[7]);
@@ -66,6 +70,7 @@ int extractbitrate(unsigned char *buf, int size){
 	provider.read = p_read;
 	provider.write = p_write;
 	provider.close = p_close;
+	provider.filesize = p_filesize;
 
 	MP4FileHandle mp4handle = MP4ReadProvider("buffer", &provider);
 	char *info = MP4Info(mp4handle);

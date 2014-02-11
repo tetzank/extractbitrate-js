@@ -63,10 +63,7 @@ File::open( std::string name_, Mode mode_ )
     if( _provider.open( _name, _mode ))
         return true;
 
-    //FileSystem::getFileSize( _name, _size );
-	_size = 2*1024*1024; //HACK
-	// getFileSize runs stat on the given file name which fails as we just work on a buffer
-	// Proper solution would be to add getSize() to MP4FileProvider
+    _size = _provider.filesize();
 
     _isOpen = true;
     return false;
@@ -182,6 +179,13 @@ CustomFileProvider::close()
 {
     return _call.close( _handle );
 }
+
+FileProvider::Size
+CustomFileProvider::filesize()
+{
+    return _call.filesize(_handle);
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
