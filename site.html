@@ -15,10 +15,11 @@
 
 <script type='text/javascript'>
 	function handleFileSelect(evt) {
-		//FIXME: same as mp4v2/libplatform/io/File.cpp:67 which is hardcoded
-		var size = 2*1024*1024; //DONT CHANGE
+		//FIXME: hardcoded size, would be better to load more if needed
+		// problem: js file api is async, need synchronous way
+		var size = 3*1024*1024;
 
-		// read the first 2MB from the file
+		// read the first 3 MB from the file
 		var blob = evt.target.files[0].slice(0, size);
 		var reader = new FileReader();
 
