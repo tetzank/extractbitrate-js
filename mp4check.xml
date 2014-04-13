@@ -62,12 +62,12 @@
 	targetline.x1.baseVal.newValueSpecifiedUnits(SVGLength.SVG_LENGTHTYPE_PERCENTAGE, targetpos);
 	targetline.x2.baseVal.newValueSpecifiedUnits(SVGLength.SVG_LENGTHTYPE_PERCENTAGE, targetpos);
 	var targettext = document.getElementById('targettext');
-	targettext.x.baseVal[0].newValueSpecifiedUnits(SVGLength.SVG_LENGTHTYPE_PERCENTAGE, targetpos);
+	targettext.x.baseVal.getItem(0).newValueSpecifiedUnits(SVGLength.SVG_LENGTHTYPE_PERCENTAGE, targetpos);
 	var maxline = document.getElementById('maxline');
 	maxline.x1.baseVal.newValueSpecifiedUnits(SVGLength.SVG_LENGTHTYPE_PERCENTAGE, maxpos);
 	maxline.x2.baseVal.newValueSpecifiedUnits(SVGLength.SVG_LENGTHTYPE_PERCENTAGE, maxpos);
 	var maxtext = document.getElementById('maxtext');
-	maxtext.x.baseVal[0].newValueSpecifiedUnits(SVGLength.SVG_LENGTHTYPE_PERCENTAGE, maxpos);
+	maxtext.x.baseVal.getItem(0).newValueSpecifiedUnits(SVGLength.SVG_LENGTHTYPE_PERCENTAGE, maxpos);
 
 	function setBitrate(bitrate){
 		var pos = bitrate / end * 100;
