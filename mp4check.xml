@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:svg="http://www.w3.org/2000/svg">
+
+<head>
+	<title>check mp4 file</title>
+</head>
+
+<body>
+
+<p>Choose mp4 file:</p>
+<input type="file" id="files" name="files[]"/>
+<hr/>
+
+<div id="results" style="display:none;">
+	<svg:svg id="bitrategraph" version="1.1" width="600" height="100">
+	<svg:defs>
+		<svg:linearGradient id="greenRedGradient">
+			<svg:stop offset="30%" stop-color="green" />
+			<svg:stop offset="90%" stop-color="red" />
+		</svg:linearGradient>
+	</svg:defs>
+
+	<!-- FIXME: remove -->
+	<!-- <svg:rect width="100%" height="100%" stroke="black" stroke-width="1" fill="none" /> -->
+
+	<svg:rect x="0" y="35%" width="100%" height="20%" fill="url(#greenRedGradient)" />
+	<svg:rect id="whitebar" x="70%" y="30%" width="100%" height="40%" fill="white" />
+
+	<svg:line id="maxline" x1="75%" y1="25%" x2="75%" y2="70%"
+		stroke="red" stroke-width="5" />
+	<svg:line id="targetline" x1="50%" y1="25%" x2="50%" y2="70%"
+		stroke="black" stroke-width="3" stroke-dasharray="1%, 1%" />
+
+	<!-- TODO: add some useful text, e.g. kbps -->
+	<svg:text id="maxtext" x="75%" y="20%" text-anchor="middle">Maximum</svg:text>
+	<svg:text id="targettext" x="50%" y="20%" text-anchor="middle">Target</svg:text>
+	</svg:svg>
+
+	<p>Bitrate: <span id="bitratetext"></span> bps</p>
+	<p>Audio Codec: <span id="audiotext"></span></p>
+	<p>Video Codec: <span id="videotext"></span></p>
+</div>
+
+<p><a href="#" onclick="toggleDisplay(document.getElementById('details'));">Details:</a></p>
+<div id="details" style="display:none;">
+	<textarea id="output" rows="8" style="font-family:monospace;width:80%;"></textarea>
+</div>
+
+<script type='text/javascript'>
+	// constants/config
+	var maxpos = 0.75;
+	var max = 1500*1024;
+	var target = 1000*1024;
+	// globals
+	var end = max / maxpos;
+	var targetpos = target / end * 100;
+	maxpos *= 100;
+	// set lines according to config
+	var targetline = document.getElementById('targetline');
+	targetline.x1.baseVal.newValueSpecifiedUnits(SVGLength.SVG_LENGTHTYPE_PERCENTAGE, targetpos);
+	targetline.x2.baseVal.newValueSpecifiedUnits(SVGLength.SVG_LENGTHTYPE_PERCENTAGE, targetpos);
+	var targettext = document.getElementById('targettext');
+	targettext.x.baseVal[0].newValueSpecifiedUnits(SVGLength.SVG_LENGTHTYPE_PERCENTAGE, targetpos);
+	var maxline = document.getElementById('maxline');
+	maxline.x1.baseVal.newValueSpecifiedUnits(SVGLength.SVG_LENGTHTYPE_PERCENTAGE, maxpos);
+	maxline.x2.baseVal.newValueSpecifiedUnits(SVGLength.SVG_LENGTHTYPE_PERCENTAGE, maxpos);
+	var maxtext = document.getElementById('maxtext');
+	maxtext.x.baseVal[0].newValueSpecifiedUnits(SVGLength.SVG_LENGTHTYPE_PERCENTAGE, maxpos);
+
+	function setBitrate(bitrate){
+		var pos = bitrate / end * 100;
+		var whitebar = document.getElementById('whitebar');
+		whitebar.x.baseVal.newValueSpecifiedUnits(SVGLength.SVG_LENGTHTYPE_PERCENTAGE, pos);
+	}
+
+	function toggleDisplay(ele){
+		if(ele.style.display == 'none'){
+			ele.style.display = 'block';
+		}else{
+			ele.style.display = 'none';
+		}
+	}
+
+	function handleFileSelect(evt) {
+		//FIXME: hardcoded size, would be better to load more if needed
+		// problem: js file api is async, need synchronous way
+		var size = 3*1024*1024;
+
+		// read the first 3 MB from the file
+		var blob = evt.target.files[0].slice(0, size);
+		var reader = new FileReader();
+
+		reader.onloadend = function(evt){
+			if(evt.target.readyState == FileReader.DONE){
+				var arr = new Uint8Array(evt.target.result);
+				var buf = Module._malloc(arr.length);
+				Module.HEAPU8.set(arr, buf);
+
+				Module.ccall(
+					'process', 'number',
+					['number', 'number'],
+					[buf, arr.length]);
+				
+				var bitrate = Module.ccall(
+					'getBitrate', 'number'
+				);
+				var audioCodec = Module.ccall(
+					'getAudioCodec', 'string'
+				);
+				var videoCodec = Module.ccall(
+					'getVideoCodec', 'string'
+				);
+
+				setBitrate(bitrate);
+				document.getElementById('bitratetext').innerHTML = bitrate;
+				document.getElementById('audiotext').innerHTML = audioCodec;
+				document.getElementById('videotext').innerHTML = videoCodec;
+
+				Module._free(buf);
+
+				document.getElementById('results').style.display = 'block';
+			}
+		};
+		reader.readAsArrayBuffer(blob);
+	}
+
+	var Module = {
+		'print': (function(){ //print stdout to textarea
+			var element = document.getElementById('output');
+			element.value = '';
+			return function(text) {
+				element.value += text + "\n";
+				element.scrollTop = element.scrollHeight; //focus on bottom
+			};
+		})()
+	};
+
+	document.getElementById('files').addEventListener('change', handleFileSelect, false);
+</script>
+<script type="text/javascript" src="mp4check.js"></script>
+
+</body>
+</html>
