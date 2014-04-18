@@ -22,9 +22,6 @@
 		</svg:linearGradient>
 	</svg:defs>
 
-	<!-- FIXME: remove -->
-	<!-- <svg:rect width="100%" height="100%" stroke="black" stroke-width="1" fill="none" /> -->
-
 	<svg:rect x="0" y="35%" width="100%" height="20%" fill="url(#greenRedGradient)" />
 	<svg:rect id="whitebar" x="70%" y="30%" width="100%" height="40%" fill="white" />
 
@@ -38,9 +35,10 @@
 	<svg:text id="targettext" x="50%" y="20%" text-anchor="middle">Target</svg:text>
 	</svg:svg>
 
-	<p>Bitrate: <span id="bitratetext"></span> bps</p>
+	<p>Bitrate: <span id="bitratetext"></span> kbps</p>
 	<p>Audio Codec: <span id="audiotext"></span></p>
 	<p>Video Codec: <span id="videotext"></span></p>
+	<p id="checkmsg" style="color:red;"></p>
 </div>
 
 <p><a href="#" onclick="toggleDisplay(document.getElementById('details'));">Details:</a></p>
@@ -49,6 +47,7 @@
 </div>
 
 <script type='text/javascript'>
+	<![CDATA[
 	// constants/config
 	var maxpos = 0.75;
 	var max = 1500*1024;
@@ -114,9 +113,30 @@
 				);
 
 				setBitrate(bitrate);
-				document.getElementById('bitratetext').innerHTML = bitrate;
+				document.getElementById('bitratetext').innerHTML = bitrate >> 10;
 				document.getElementById('audiotext').innerHTML = audioCodec;
 				document.getElementById('videotext').innerHTML = videoCodec;
+
+				var msg = document.getElementById('checkmsg');
+				var allowed = true;
+				msg.innerHTML = '';
+				if(bitrate > max){
+					msg.innerHTML += "Your video file exceeds the maximum bitrate. ";
+					allowed = false;
+				}else if(bitrate > target){
+					msg.innerHTML += "WARNING: Your video file exceeds the recommended bitrate. Try to make smaller files. ";
+				}
+				if(audioCodec == 'Unsupported'){
+					msg.innerHTML += "The audio codec isn't supported. ";
+					allowed = false;
+				}
+				if(videoCodec == 'Unsupported'){
+					msg.innerHTML += "The video codec isn't supported. ";
+					allowed = false;
+				}
+				if(!allowed){
+					msg.innerHTML += "You are not allowed to upload this file.";
+				}
 
 				Module._free(buf);
 
@@ -138,6 +158,7 @@
 	};
 
 	document.getElementById('files').addEventListener('change', handleFileSelect, false);
+	]]>
 </script>
 <script type="text/javascript" src="mp4check.js"></script>
 
