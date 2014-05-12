@@ -41,12 +41,17 @@
 	<p id="checkmsg" style="color:red;"></p>
 </div>
 
+<p><a href="#" onclick="toggleDisplay(document.getElementById('preview'));">Preview:</a></p>
+<div id="preview" style="display:none;">
+	<video id="video" controls="controls" />
+</div>
+
 <p><a href="#" onclick="toggleDisplay(document.getElementById('details'));">Details:</a></p>
 <div id="details" style="display:none;">
 	<textarea id="output" rows="8" style="font-family:monospace;width:80%;"></textarea>
 </div>
 
-<script type='text/javascript'>
+<script type="application/ecmascript">
 	<![CDATA[
 	// constants/config
 	var maxpos = 0.75;
@@ -88,7 +93,8 @@
 		var size = 3*1024*1024;
 
 		// read the first 3 MB from the file
-		var blob = evt.target.files[0].slice(0, size);
+		var file = evt.target.files[0];
+		var blob = file.slice(0, size);
 		var reader = new FileReader();
 
 		reader.onloadend = function(evt){
@@ -144,6 +150,9 @@
 			}
 		};
 		reader.readAsArrayBuffer(blob);
+
+		// load preview
+		document.getElementById('video').src = URL.createObjectURL(file);
 	}
 
 	var Module = {
