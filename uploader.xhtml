@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+	<title>test resumable.js</title>
+	<style type="text/css">
+
+.loading-bar {
+/* 	margin-bottom: 40px; */
+
+	width: 500px;
+	height: 61px;
+	border-radius: 5px;
+	background-color: #282f32;
+	padding: 4px 5px;
+}
+
+.amount {
+	height: 60px;
+	border-radius: 5px;
+	margin-top: -45px;
+
+	background-color: #8ac320;
+	box-shadow: inset 0px 4px 40px rgba(255,255,255,0.2), 0 10px 10px -5px #79aa1e , 0 7px 0 #628c14;
+}
+
+.loaded {
+	text-align: center;
+	font-family: Helvetica, sans-serif;
+	font-weight: bold;
+	position: relative;
+	top: 9px;
+	font-size: 30px;
+	color: #fff;
+}
+
+	</style>
+</head>
+
+<body>
+
+<p>Choose mp4 file:</p>
+<input type="file" id="files" name="files[]"/>
+<input type="button" id="upload_start" value="start" />
+<input type="button" id="upload_pause" value="pause" />
+<input type="button" id="upload_cancel" value="cancel" />
+<hr/>
+
+<p>Status: <span id="statustext" /></p>
+<p>Progress: <span id="progresstext" /></p>
+
+<div id="bar" class="loading-bar">
+	<div class="loaded">0%</div>
+	<div class="amount" style="width: 0%;" />
+</div>
+
+
+<script type="application/ecmascript" src="resumable.js" />
+<script type="application/ecmascript" src="mp4check.js" />
+
+<script type="application/ecmascript">
+	<![CDATA[
+// constants/config
+var max = 1500*1024; //maximum bitrate
+
+var r = new Resumable({
+  target:'upload.php'
+});
+
+if(!r.support) {
+	alert('not supported');
+}else{
+
+function handleFileSelect(evt) {
+	var file = evt.target.files[0];
+	if(r.files.length != 0){ //we only want one file
+		r.removeFile(r.files[0]); //remove previously added file
+	}
+	//check file
+	var mp4check = new MP4Check();
+	mp4check.checkFile(evt.target.files[0], function(){
+		var allowed = true;
+		if(mp4check.bitrate > max){
+			alert("Your video file exceeds the maximum bitrate.");
+			allowed = false;
+		}
+		if(mp4check.audioCodec == 'Unsupported'){
+			alert("The audio codec isn't supported.");
+			allowed = false;
+		}
+		if(mp4check.videoCodec == 'Unsupported'){
+			alert("The video codec isn't supported.");
+			allowed = false;
+		}
+		if(allowed){
+			//only then add
+			r.addFile(file);
+		}
+	});
+}
+document.getElementById('files').addEventListener('change', handleFileSelect, false);
+
+document.getElementById('upload_start').addEventListener('click', function(){
+	r.upload();
+}, false);
+document.getElementById('upload_pause').addEventListener('click', function(){
+	r.pause();
+}, false);
+document.getElementById('upload_cancel').addEventListener('click', function(){
+	r.cancel();
+}, false);
+
+//resumable.js events
+r.on('fileProgress', function(file){
+	var percent = String(Math.ceil(file.progress()*100 * 10) / 10) + "%";
+	document.getElementById('progresstext').innerHTML = percent;
+
+	var bar = document.getElementById('bar');
+	bar.children[0].innerHTML = percent;
+	bar.children[1].style.width = percent;
+});
+r.on('uploadStart', function(){
+	document.getElementById('statustext').innerHTML = "uploading";
+});
+r.on('complete', function(){
+	document.getElementById('statustext').innerHTML = "complete";
+});
+r.on('error', function(message, file){
+	alert('got error');
+	console.debug(message, file);
+});
+r.on('pause', function(){
+	document.getElementById('statustext').innerHTML = "paused";
+});
+r.on('cancel', function(){
+	document.getElementById('statustext').innerHTML = "canceled";
+});
+
+} //else !supported
+	]]>
+</script>
+
+</body>
+</html>
