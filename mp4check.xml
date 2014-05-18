@@ -88,68 +88,38 @@
 	}
 
 	function handleFileSelect(evt) {
-		//FIXME: hardcoded size, would be better to load more if needed
-		// problem: js file api is async, need synchronous way
-		var size = 3*1024*1024;
-
-		// read the first 3 MB from the file
 		var file = evt.target.files[0];
-		var blob = file.slice(0, size);
-		var reader = new FileReader();
 
-		reader.onloadend = function(evt){
-			if(evt.target.readyState == FileReader.DONE){
-				var arr = new Uint8Array(evt.target.result);
-				var buf = Module._malloc(arr.length);
-				Module.HEAPU8.set(arr, buf);
+		var mp4check = new MP4Check();
+		mp4check.checkFile(file, function(){
+			setBitrate(mp4check.bitrate);
+			document.getElementById('bitratetext').innerHTML = mp4check.bitrate >> 10;
+			document.getElementById('audiotext').innerHTML = mp4check.audioCodec;
+			document.getElementById('videotext').innerHTML = mp4check.videoCodec;
 
-				Module.ccall(
-					'process', 'number',
-					['number', 'number'],
-					[buf, arr.length]);
-				
-				var bitrate = Module.ccall(
-					'getBitrate', 'number'
-				);
-				var audioCodec = Module.ccall(
-					'getAudioCodec', 'string'
-				);
-				var videoCodec = Module.ccall(
-					'getVideoCodec', 'string'
-				);
-
-				setBitrate(bitrate);
-				document.getElementById('bitratetext').innerHTML = bitrate >> 10;
-				document.getElementById('audiotext').innerHTML = audioCodec;
-				document.getElementById('videotext').innerHTML = videoCodec;
-
-				var msg = document.getElementById('checkmsg');
-				var allowed = true;
-				msg.innerHTML = '';
-				if(bitrate > max){
-					msg.innerHTML += "Your video file exceeds the maximum bitrate. ";
-					allowed = false;
-				}else if(bitrate > target){
-					msg.innerHTML += "WARNING: Your video file exceeds the recommended bitrate. Try to make smaller files. ";
-				}
-				if(audioCodec == 'Unsupported'){
-					msg.innerHTML += "The audio codec isn't supported. ";
-					allowed = false;
-				}
-				if(videoCodec == 'Unsupported'){
-					msg.innerHTML += "The video codec isn't supported. ";
-					allowed = false;
-				}
-				if(!allowed){
-					msg.innerHTML += "You are not allowed to upload this file.";
-				}
-
-				Module._free(buf);
-
-				document.getElementById('results').style.display = 'block';
+			var msg = document.getElementById('checkmsg');
+			var allowed = true;
+			msg.innerHTML = '';
+			if(mp4check.bitrate > max){
+				msg.innerHTML += "Your video file exceeds the maximum bitrate. ";
+				allowed = false;
+			}else if(mp4check.bitrate > target){
+				msg.innerHTML += "WARNING: Your video file exceeds the recommended bitrate. Try to make smaller files. ";
 			}
-		};
-		reader.readAsArrayBuffer(blob);
+			if(mp4check.audioCodec == 'Unsupported'){
+				msg.innerHTML += "The audio codec isn't supported. ";
+				allowed = false;
+			}
+			if(mp4check.videoCodec == 'Unsupported'){
+				msg.innerHTML += "The video codec isn't supported. ";
+				allowed = false;
+			}
+			if(!allowed){
+				msg.innerHTML += "You are not allowed to upload this file.";
+			}
+
+			document.getElementById('results').style.display = 'block';
+		});
 
 		// load preview
 		document.getElementById('video').src = URL.createObjectURL(file);
