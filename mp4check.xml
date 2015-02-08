@@ -127,109 +127,7 @@
 		});
 
 		// load preview
-		var vid = document.getElementById('video');
-		vid.addEventListener('loadeddata', function(event){
-			this.contrast = 1;
-			this.brightness = 1;
-		}, false);
-		vid.addEventListener('play', function(event){
-			this.focus();
-		}, false);
-		vid.addEventListener('keydown', function(event){
-			var key = event.key || event.keyIdentifier; //fallback for chromium
-			switch (key) {
-				case "ArrowLeft":
-				case "Left": //chromium
-					this.currentTime -= 10; // 10s back
-					event.preventDefault();
-					break;
-				case "ArrowRight":
-				case "Right": //chromium
-					this.currentTime += 10; // 10s forward
-					event.preventDefault();
-					break;
-				case "ArrowUp":
-				case "Up": //chromium
-					this.currentTime += 60; // 60s forward
-					event.preventDefault();
-					break;
-				case "ArrowDown":
-				case "Down": //chromium
-					this.currentTime -= 60; // 60s back
-					event.preventDefault();
-					break;
-				case "PageUp":
-					this.currentTime += 600; // 10min forward
-					event.preventDefault();
-					break;
-				case "PageDown":
-					this.currentTime -= 600; // 10min back
-					event.preventDefault();
-					break;
-				case "U+0020": // Space
-					if(this.paused){
-						this.play();
-					}else{
-						this.pause();
-					}
-					event.preventDefault(); // just making sure nothing else happens
-					break;
-				case "U+004D": // m
-					this.muted = !this.muted;
-					event.preventDefault(); // just making sure nothing else happens
-					break;
-				case "U+0046": // f
-					if (this.requestFullscreen) {
-						this.requestFullscreen();
-					} else if (this.mozRequestFullScreen) {
-						this.mozRequestFullScreen();
-					} else if (this.webkitRequestFullScreen) {
-						this.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
-					}
-					event.preventDefault(); // just making sure nothing else happens
-					break;
-				case "U+0030": // 0
-					this.volume = Math.min(this.volume + 0.1, 1); // louder
-					event.preventDefault(); // just making sure nothing else happens
-					break;
-				case "U+0039": // 9
-					this.volume = Math.max(this.volume - 0.1, 0); // quieter
-					event.preventDefault(); // just making sure nothing else happens
-					break;
-				case "U+0031": // 1
-					this.contrast = Math.max(this.contrast - 0.1, 0); // decrease contrast
-					setFilter(this);
-					event.preventDefault(); // just making sure nothing else happens
-					break;
-				case "U+0032": // 2
-					this.contrast += 0.1; // increase contrast
-					setFilter(this);
-					event.preventDefault(); // just making sure nothing else happens
-					break;
-				case "U+0033": // 3
-					this.brightness = Math.max(this.brightness - 0.1, 0); // decrease brightness
-					setFilter(this);
-					event.preventDefault(); // just making sure nothing else happens
-					break;
-				case "U+0034": // 4
-					this.brightness += 0.1; // increase brightness
-					setFilter(this);
-					event.preventDefault(); // just making sure nothing else happens
-					break;
-				case "U+0052": // r
-					// reset contrast and brightness
-					this.contrast = 1;
-					this.brightness = 1;
-					setFilter(this);
-					event.preventDefault(); // just making sure nothing else happens
-					break;
-
-// 				default:
-// 					console.log("keyIdentifier: "+ event.keyIdentifier);
-// 					return; // Quit when this doesn't handle the key event.
-			}
-		}, false);
-		vid.src = URL.createObjectURL(file);
+		document.getElementById('video').src = URL.createObjectURL(file);
 	}
 
 	var Module = {
@@ -242,6 +140,109 @@
 			};
 		})()
 	};
+
+	var vid = document.getElementById('video');
+	vid.addEventListener('loadeddata', function(event){
+		this.contrast = 1;
+		this.brightness = 1;
+	}, false);
+	vid.addEventListener('play', function(event){
+		this.focus();
+	}, false);
+	vid.addEventListener('keydown', function(event){
+		var key = event.key || event.keyIdentifier; //fallback for chromium
+		switch (key) {
+			case "ArrowLeft":
+			case "Left": //chromium
+				this.currentTime -= 10; // 10s back
+				event.preventDefault();
+				break;
+			case "ArrowRight":
+			case "Right": //chromium
+				this.currentTime += 10; // 10s forward
+				event.preventDefault();
+				break;
+			case "ArrowUp":
+			case "Up": //chromium
+				this.currentTime += 60; // 60s forward
+				event.preventDefault();
+				break;
+			case "ArrowDown":
+			case "Down": //chromium
+				this.currentTime -= 60; // 60s back
+				event.preventDefault();
+				break;
+			case "PageUp":
+				this.currentTime += 600; // 10min forward
+				event.preventDefault();
+				break;
+			case "PageDown":
+				this.currentTime -= 600; // 10min back
+				event.preventDefault();
+				break;
+			case "U+0020": // Space
+				if(this.paused){
+					this.play();
+				}else{
+					this.pause();
+				}
+				event.preventDefault(); // just making sure nothing else happens
+				break;
+			case "U+004D": // m
+				this.muted = !this.muted;
+				event.preventDefault(); // just making sure nothing else happens
+				break;
+			case "U+0046": // f
+				if (this.requestFullscreen) {
+					this.requestFullscreen();
+				} else if (this.mozRequestFullScreen) {
+					this.mozRequestFullScreen();
+				} else if (this.webkitRequestFullScreen) {
+					this.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+				}
+				event.preventDefault(); // just making sure nothing else happens
+				break;
+			case "U+0030": // 0
+				this.volume = Math.min(this.volume + 0.1, 1); // louder
+				event.preventDefault(); // just making sure nothing else happens
+				break;
+			case "U+0039": // 9
+				this.volume = Math.max(this.volume - 0.1, 0); // quieter
+				event.preventDefault(); // just making sure nothing else happens
+				break;
+			case "U+0031": // 1
+				this.contrast = Math.max(this.contrast - 0.1, 0); // decrease contrast
+				setFilter(this);
+				event.preventDefault(); // just making sure nothing else happens
+				break;
+			case "U+0032": // 2
+				this.contrast += 0.1; // increase contrast
+				setFilter(this);
+				event.preventDefault(); // just making sure nothing else happens
+				break;
+			case "U+0033": // 3
+				this.brightness = Math.max(this.brightness - 0.1, 0); // decrease brightness
+				setFilter(this);
+				event.preventDefault(); // just making sure nothing else happens
+				break;
+			case "U+0034": // 4
+				this.brightness += 0.1; // increase brightness
+				setFilter(this);
+				event.preventDefault(); // just making sure nothing else happens
+				break;
+			case "U+0052": // r
+				// reset contrast and brightness
+				this.contrast = 1;
+				this.brightness = 1;
+				setFilter(this);
+				event.preventDefault(); // just making sure nothing else happens
+				break;
+
+// 			default:
+// 				console.log("keyIdentifier: "+ event.keyIdentifier);
+// 				return; // Quit when this doesn't handle the key event.
+		}
+	}, false);
 
 	document.getElementById('files').addEventListener('change', handleFileSelect, false);
 	]]>
