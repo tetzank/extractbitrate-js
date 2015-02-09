@@ -180,6 +180,7 @@
 				this.currentTime -= 600; // 10min back
 				event.preventDefault();
 				break;
+			case " ":
 			case "U+0020": // Space
 				if(this.paused){
 					this.play();
@@ -188,10 +189,12 @@
 				}
 				event.preventDefault(); // just making sure nothing else happens
 				break;
+			case "m":
 			case "U+004D": // m
 				this.muted = !this.muted;
 				event.preventDefault(); // just making sure nothing else happens
 				break;
+			case "f":
 			case "U+0046": // f
 				if (this.requestFullscreen) {
 					this.requestFullscreen();
@@ -202,34 +205,41 @@
 				}
 				event.preventDefault(); // just making sure nothing else happens
 				break;
+			case "0":
 			case "U+0030": // 0
 				this.volume = Math.min(this.volume + 0.1, 1); // louder
 				event.preventDefault(); // just making sure nothing else happens
 				break;
+			case "9":
 			case "U+0039": // 9
 				this.volume = Math.max(this.volume - 0.1, 0); // quieter
 				event.preventDefault(); // just making sure nothing else happens
 				break;
+			case "1":
 			case "U+0031": // 1
 				this.contrast = Math.max(this.contrast - 0.1, 0); // decrease contrast
 				setFilter(this);
 				event.preventDefault(); // just making sure nothing else happens
 				break;
+			case "2":
 			case "U+0032": // 2
 				this.contrast += 0.1; // increase contrast
 				setFilter(this);
 				event.preventDefault(); // just making sure nothing else happens
 				break;
+			case "3":
 			case "U+0033": // 3
 				this.brightness = Math.max(this.brightness - 0.1, 0); // decrease brightness
 				setFilter(this);
 				event.preventDefault(); // just making sure nothing else happens
 				break;
+			case "4":
 			case "U+0034": // 4
 				this.brightness += 0.1; // increase brightness
 				setFilter(this);
 				event.preventDefault(); // just making sure nothing else happens
 				break;
+			case "r":
 			case "U+0052": // r
 				// reset contrast and brightness
 				this.contrast = 1;
@@ -237,9 +247,26 @@
 				setFilter(this);
 				event.preventDefault(); // just making sure nothing else happens
 				break;
+			case "[":
+			case "a":
+			case "U+0041": // a
+				this.playbackRate -= 0.1; // decrease speed
+				event.preventDefault(); // just making sure nothing else happens
+				break;
+			case "]":
+			case "s":
+			case "U+0053": // s
+				this.playbackRate += 0.1; // increase speed
+				event.preventDefault(); // just making sure nothing else happens
+				break;
+			case "Backspace":
+			case "U+0008": // backspace
+				this.playbackRate = 1; // reset speed
+				event.preventDefault(); // just making sure nothing else happens
+				break;
 
 // 			default:
-// 				console.log("keyIdentifier: "+ event.keyIdentifier);
+// 				console.log("keyIdentifier: "+ key);
 // 				return; // Quit when this doesn't handle the key event.
 		}
 	}, false);
