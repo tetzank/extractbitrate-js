@@ -44,6 +44,8 @@
 <p><a href="#" onclick="toggleDisplay(document.getElementById('preview'));">Preview:</a></p>
 <div id="preview" style="display:none;">
 	<video id="video" type="video/mp4" controls="controls" />
+
+	<img id="snapshot" src="" />
 </div>
 
 <p><a href="#" onclick="toggleDisplay(document.getElementById('details'));">Details:</a></p>
@@ -248,14 +250,14 @@
 				event.preventDefault(); // just making sure nothing else happens
 				break;
 			case "[":
-			case "a":
-			case "U+0041": // a
+			case "q":
+			case "U+0051": // q
 				this.playbackRate /= 1.1; // decrease speed
 				event.preventDefault(); // just making sure nothing else happens
 				break;
 			case "]":
-			case "s":
-			case "U+0053": // s
+			case "w":
+			case "U+0057": // w
 				this.playbackRate *= 1.1; // increase speed
 				event.preventDefault(); // just making sure nothing else happens
 				break;
@@ -266,14 +268,31 @@
 				break;
 			case ".":
 			case "U+00BE":
-				this.pause(); // pause video and step one frame forward
+				if(!this.paused) this.pause(); // pause video and step one frame forward
 				this.currentTime += 1/30; // assumes 30 fps, works fine for 25 fps
 				event.preventDefault(); // just making sure nothing else happens
 				break;
 			case ",":
 			case "U+00BC":
-				this.pause(); // pause video and step one frame back
+				if(!this.paused) this.pause(); // pause video and step one frame back
 				this.currentTime -= 1/30; // assumes 30 fps, works fine for 25 fps
+				event.preventDefault(); // just making sure nothing else happens
+				break;
+
+			case "s":
+			case "U+0053": // s
+				// take snapshot and display in img below
+				var canvas = document.createElement('canvas');
+				var ctx = canvas.getContext('2d');
+				var img = document.getElementById('snapshot');
+				canvas.width = this.videoWidth;
+				canvas.height = this.videoHeight;
+				ctx.drawImage(this, 0, 0);
+				img.src = canvas.toDataURL('image/png');
+				
+				this.pause();
+				this.blur(); // loose keyboard focus on video
+				img.scrollIntoView();
 				event.preventDefault(); // just making sure nothing else happens
 				break;
 
