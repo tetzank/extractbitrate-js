@@ -250,13 +250,13 @@
 			case "[":
 			case "a":
 			case "U+0041": // a
-				this.playbackRate -= 0.1; // decrease speed
+				this.playbackRate /= 1.1; // decrease speed
 				event.preventDefault(); // just making sure nothing else happens
 				break;
 			case "]":
 			case "s":
 			case "U+0053": // s
-				this.playbackRate += 0.1; // increase speed
+				this.playbackRate *= 1.1; // increase speed
 				event.preventDefault(); // just making sure nothing else happens
 				break;
 			case "Backspace":
@@ -264,6 +264,19 @@
 				this.playbackRate = 1; // reset speed
 				event.preventDefault(); // just making sure nothing else happens
 				break;
+			case ".":
+			case "U+00BE":
+				this.pause(); // pause video and step one frame forward
+				this.currentTime += 1/30; // assumes 30 fps, works fine for 25 fps
+				event.preventDefault(); // just making sure nothing else happens
+				break;
+			case ",":
+			case "U+00BC":
+				this.pause(); // pause video and step one frame back
+				this.currentTime -= 1/30; // assumes 30 fps, works fine for 25 fps
+				event.preventDefault(); // just making sure nothing else happens
+				break;
+
 
 // 			default:
 // 				console.log("keyIdentifier: "+ key);
