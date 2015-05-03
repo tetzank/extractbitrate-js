@@ -6,8 +6,6 @@
 	<title>Mp4Box.js file metadata extraction</title>
 
 	<script src="mp4box.simple.min.js"></script>
-<!-- 	<script src="mp4box.simple.js"></script> -->
-<!-- 	<script src="mp4box.all.js"></script> -->
 </head>
 <body>
 
@@ -42,6 +40,14 @@
 			console.log("mp4box failed to parse data."); 
 		};
 
+		var bitratetext = document.getElementById('bitratetext');
+		var audiotext = document.getElementById('audiotext');
+		var videotext = document.getElementById('videotext');
+		// reset all displays
+		bitratetext.innerHTML = '';
+		audiotext.innerHTML = '';
+		videotext.innerHTML = '';
+		
 		var done = false;
 		//doesn't get called when there's no mp4 in the data, e.g. other video format like webm
 		mp4box.onReady = function (info) {
@@ -51,14 +57,18 @@
 
 			var max = 1500*1024;
 			var target = 1000*1024;
-			//FIXME: videos with no audio or just audio, so either video or audio, are not supported currently
-			//       -> they crash
-			var overall_bitrate = info.videoTracks[0].bitrate + info.audioTracks[0].bitrate;
-			var audioCodec = info.audioTracks[0].codec;
-			var videoCodec = info.videoTracks[0].codec;
-			document.getElementById('bitratetext').innerHTML = overall_bitrate / 1000 |0;
-			document.getElementById('audiotext').innerHTML = audioCodec;
-			document.getElementById('videotext').innerHTML = videoCodec;
+			var overall_bitrate=0, audioCodec='n/a', videoCodec='n/a';
+			if(info.videoTracks.length > 0){
+				overall_bitrate += info.videoTracks[0].bitrate;
+				videoCodec = info.videoTracks[0].codec;
+			}
+			if(info.audioTracks.length > 0){
+				overall_bitrate += info.audioTracks[0].bitrate;
+				audioCodec = info.audioTracks[0].codec;
+			}
+			bitratetext.innerHTML = overall_bitrate / 1000 |0;
+			audiotext.innerHTML = audioCodec;
+			videotext.innerHTML = videoCodec;
 
 			var msg = document.getElementById('checkmsg');
 			var allowed = true;
@@ -81,12 +91,16 @@
 			}else if(overall_bitrate > target){
 				msg.innerHTML += "WARNING: Your video file exceeds the recommended bitrate. Try to make smaller files. ";
 			}
-			if(audioCodec != 'mp4a'){
+			if(audioCodec!='n/a' && audioCodec!='mp4a'){
 				msg.innerHTML += "The audio codec isn't supported. ";
 				allowed = false;
 			}
-			if(!videoCodec.startsWith('avc1')){
+			if(videoCodec!='n/a' && !videoCodec.startsWith('avc1')){
 				msg.innerHTML += "The video codec isn't supported. ";
+				allowed = false;
+			}
+			if(audioCodec=='n/a' && videoCodec=='n/a'){
+				msg.innerHTML += "No usable track found. ";
 				allowed = false;
 			}
 			if(!allowed){
