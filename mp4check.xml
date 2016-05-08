@@ -57,8 +57,8 @@
 	<![CDATA[
 	// constants/config
 	var maxpos = 0.75;
-	var max = 1500*1024;
-	var target = 1000*1024;
+	var max = 1500*1000;
+	var target = 1000*1000;
 	// globals
 	var end = max / maxpos;
 	var targetpos = target / end * 100;
@@ -100,7 +100,7 @@
 		var mp4check = new MP4Check();
 		mp4check.checkFile(file, function(){
 			setBitrate(mp4check.bitrate);
-			document.getElementById('bitratetext').innerHTML = mp4check.bitrate >> 10;
+			document.getElementById('bitratetext').innerHTML = mp4check.bitrate / 1000 |0;
 			document.getElementById('audiotext').innerHTML = mp4check.audioCodec;
 			document.getElementById('videotext').innerHTML = mp4check.videoCodec;
 

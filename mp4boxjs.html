@@ -5,11 +5,11 @@
 
 	<title>Mp4Box.js file metadata extraction</title>
 
-	<script src="mp4box.simple.min.js"></script>
+	<script src="mp4box.all.min.js"></script>
 </head>
 <body>
 
-<p>Choose mp4 files:</p>
+<p>Choose mp4 file:</p>
 <input type="file" id="files" name="files[]" accept="video/mp4" />
 <hr/>
 
@@ -22,41 +22,42 @@
 
 
 <script type="application/ecmascript">
-
 	document.getElementById('files').addEventListener('change', function(evt){
+		var bitratetext = document.getElementById('bitratetext');
+		var audiotext = document.getElementById('audiotext');
+		var videotext = document.getElementById('videotext');
+		var output = document.getElementById('output');
+		// reset all displays
+		bitratetext.innerHTML = '';
+		audiotext.innerHTML = '';
+		videotext.innerHTML = '';
+		output.innerHTML = '';
+
+		if(evt.target.files.length == 0) return;
 		var file = evt.target.files[0];
 
 		var chunkSize  = 3 * 1024 * 1024; // bytes
 
 		var fileSize   = file.size;
 		var offset     = 0;
-		var self       = this; // we need a reference to the current object
 		var readBlock  = null;
 		var startDate  = new Date();
 		
-		mp4box 	   = new MP4Box();
+		var mp4box     = new MP4Box();
 
 		mp4box.onError = function(e) { 
 			console.log("mp4box failed to parse data."); 
 		};
-
-		var bitratetext = document.getElementById('bitratetext');
-		var audiotext = document.getElementById('audiotext');
-		var videotext = document.getElementById('videotext');
-		// reset all displays
-		bitratetext.innerHTML = '';
-		audiotext.innerHTML = '';
-		videotext.innerHTML = '';
 		
 		var done = false;
 		//doesn't get called when there's no mp4 in the data, e.g. other video format like webm
 		mp4box.onReady = function (info) {
 			console.log("Received File Information");
 			done = true; //stop reading all the data, we have what we wanted
-			document.getElementById('output').innerHTML = JSON.stringify(info);
+			output.innerHTML = JSON.stringify(info);
 
-			var max = 1500*1024;
-			var target = 1000*1024;
+			var max = 1500*1000;
+			var target = 1000*1000;
 			var overall_bitrate=0, audioCodec='n/a', videoCodec='n/a';
 			if(info.videoTracks.length > 0){
 				overall_bitrate += info.videoTracks[0].bitrate;
@@ -91,7 +92,7 @@
 			}else if(overall_bitrate > target){
 				msg.innerHTML += "WARNING: Your video file exceeds the recommended bitrate. Try to make smaller files. ";
 			}
-			if(audioCodec!='n/a' && audioCodec!='mp4a'){
+			if(audioCodec!='n/a' && !audioCodec.startsWith('mp4a.40')){
 				msg.innerHTML += "The audio codec isn't supported. ";
 				allowed = false;
 			}
